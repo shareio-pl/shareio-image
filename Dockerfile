@@ -20,7 +20,7 @@ RUN apk add curl
 
 RUN mkdir /images
 
-COPY images/test.png /images/test.png
+COPY images /images
 
 EXPOSE 8084
 
