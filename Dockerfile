@@ -18,6 +18,10 @@ COPY --from=build /app/target/image-0.0.1-SNAPSHOT.jar .
 
 RUN apk add curl
 
+RUN mkdir /images
+
+COPY images/test.png /images/test.png
+
 EXPOSE 8084
 
 CMD ["java", "-jar", "image-0.0.1-SNAPSHOT.jar"]
