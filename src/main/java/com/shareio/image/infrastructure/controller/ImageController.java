@@ -1,7 +1,9 @@
 package com.shareio.image.infrastructure.controller;
 
+import com.shareio.image.core.usecases.port.in.DeleteImageUseCaseInterface;
 import com.shareio.image.core.usecases.port.in.GetImageUseCaseInterface;
 import com.shareio.image.exceptions.ImageDoesNotExistException;
+import com.shareio.image.exceptions.ImageIOException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -11,13 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-
 @AllArgsConstructor
 @RestController
 @RequestMapping("/image")
 public class ImageController {
     private final GetImageUseCaseInterface getImageUseCaseInterface;
+    private final DeleteImageUseCaseInterface deleteImageUseCaseInterface;
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     private ResponseEntity<byte[]> getImage(@PathVariable(value = "id") String id) {
@@ -26,7 +27,7 @@ public class ImageController {
         byte[] image;
         try {
             image = getImageUseCaseInterface.getImage(id);
-        } catch (IOException e) {
+        } catch (ImageIOException e) {
             return new ResponseEntity<>(null, HttpStatusCode.valueOf(500));
         } catch (ImageDoesNotExistException e) {
             return new ResponseEntity<>(null, HttpStatusCode.valueOf(404));
@@ -46,6 +47,13 @@ public class ImageController {
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> deleteImage(@PathVariable(value = "id") String id) {
-        return new ResponseEntity<>("Not implemented", HttpStatusCode.valueOf(501));
+        try {
+            deleteImageUseCaseInterface.deleteImage(id);
+        } catch (ImageIOException e) {
+            return new ResponseEntity<>(null, HttpStatusCode.valueOf(500));
+        } catch (ImageDoesNotExistException e) {
+            return new ResponseEntity<>(null, HttpStatusCode.valueOf(404));
+        }
+        return new ResponseEntity<>(id, HttpStatusCode.valueOf(200));
     }
 }
