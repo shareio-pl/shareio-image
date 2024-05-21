@@ -7,19 +7,15 @@ import com.shareio.image.exceptions.ImageDoesNotExistException;
 import com.shareio.image.exceptions.ImageExistsException;
 import com.shareio.image.exceptions.ImageIOException;
 import lombok.AllArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Objects;
 
-import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_TYPE;
 import static org.apache.tomcat.util.http.fileupload.FileUploadBase.MULTIPART_FORM_DATA;
 
 @AllArgsConstructor
@@ -32,6 +28,7 @@ public class ImageController {
 
     private final static Long MAX_FILE_SIZE = (long) ((1024 * 1024) * 10); // 10MB
     private final static String MIME_IMAGE_PNG = "image/png";
+    private final static String DEFAULT_IMAGE_ID = "00000000-0000-0000-0000-000000000000";
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     private ResponseEntity<byte[]> getImage(@PathVariable(value = "id") String id) {
@@ -77,11 +74,15 @@ public class ImageController {
 
     @RequestMapping(value = "/createJPG/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> createImageJPG(@PathVariable(value = "id") String id) {
-        return new ResponseEntity<>("Not implemented", HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>("Not implemented - did not save " + id + ".jpg!", HttpStatus.NOT_IMPLEMENTED);
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> deleteImage(@PathVariable(value = "id") String id) {
+        if (id.equals(DEFAULT_IMAGE_ID)) {
+            return new ResponseEntity<>("Can not delete default image", HttpStatus.METHOD_NOT_ALLOWED);
+        }
+
         try {
             deleteImageUseCaseInterface.deleteImage(id);
         } catch (ImageIOException e) {
