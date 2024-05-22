@@ -41,7 +41,7 @@ public class ImageController {
     }
 
     @RequestMapping(value = "/createPNG/{id}", method = RequestMethod.POST, consumes = MULTIPART_FORM_DATA, produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> createImagePNG(@PathVariable(value = "id") String id, @RequestParam("file") MultipartFile file) {
+    private ResponseEntity<String> createImagePNG(@PathVariable(value = "id") String id, @RequestPart("file") MultipartFile file) {
         if (!Objects.equals(file.getContentType(), Const.MIME_IMAGE_PNG)) {
             return new ResponseEntity<>("Unsupported file type. This endpoint accepts only PNG images", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         }
@@ -75,7 +75,7 @@ public class ImageController {
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> deleteImage(@PathVariable(value = "id") String id) {
-        if (id.equals(DEFAULT_IMAGE_ID)) {
+        if (id.equals(Const.DEFAULT_UUID)) {
             return new ResponseEntity<>("Can not delete default image", HttpStatus.METHOD_NOT_ALLOWED);
         }
 
