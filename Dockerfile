@@ -22,6 +22,8 @@ RUN mkdir /images
 
 COPY images /images
 
+COPY images/00000000-0000-0000-0000-000000000000.png /00000000-0000-0000-0000-000000000000.png
+
 EXPOSE 8084
 
 CMD ["java", "-jar", "image-0.0.1-SNAPSHOT.jar"]
