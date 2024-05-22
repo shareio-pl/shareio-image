@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Objects;
 
-import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_TYPE;
 import static org.apache.tomcat.util.http.fileupload.FileUploadBase.MULTIPART_FORM_DATA;
 
 @AllArgsConstructor
@@ -71,11 +70,15 @@ public class ImageController {
 
     @RequestMapping(value = "/createJPG/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> createImageJPG(@PathVariable(value = "id") String id) {
-        return new ResponseEntity<>("Not implemented", HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>("Not implemented - did not save " + id + ".jpg!", HttpStatus.NOT_IMPLEMENTED);
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> deleteImage(@PathVariable(value = "id") String id) {
+        if (id.equals(DEFAULT_IMAGE_ID)) {
+            return new ResponseEntity<>("Can not delete default image", HttpStatus.METHOD_NOT_ALLOWED);
+        }
+
         try {
             deleteImageUseCaseInterface.deleteImage(id);
         } catch (ImageIOException e) {
