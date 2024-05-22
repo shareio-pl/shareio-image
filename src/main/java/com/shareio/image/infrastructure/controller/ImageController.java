@@ -1,5 +1,6 @@
 package com.shareio.image.infrastructure.controller;
 
+import com.shareio.image.Const;
 import com.shareio.image.core.usecases.port.in.CreateImagePNGUseCaseInterface;
 import com.shareio.image.core.usecases.port.in.DeleteImageUseCaseInterface;
 import com.shareio.image.core.usecases.port.in.GetImageUseCaseInterface;
@@ -7,13 +8,10 @@ import com.shareio.image.exceptions.ImageDoesNotExistException;
 import com.shareio.image.exceptions.ImageExistsException;
 import com.shareio.image.exceptions.ImageIOException;
 import lombok.AllArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,12 +28,8 @@ public class ImageController {
     private final CreateImagePNGUseCaseInterface createImagePNGUseCaseInterface;
     private final DeleteImageUseCaseInterface deleteImageUseCaseInterface;
 
-    private final static Long MAX_FILE_SIZE = (long) ((1024 * 1024) * 10); // 10MB
-    private final static String MIME_IMAGE_PNG = "image/png";
-
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     private ResponseEntity<byte[]> getImage(@PathVariable(value = "id") String id) {
-        // TODO: id may require verification / sanitization
         byte[] image;
         try {
             image = getImageUseCaseInterface.getImage(id);
@@ -49,12 +43,12 @@ public class ImageController {
 
     @RequestMapping(value = "/createPNG/{id}", method = RequestMethod.POST, consumes = MULTIPART_FORM_DATA, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> createImagePNG(@PathVariable(value = "id") String id, @RequestParam("file") MultipartFile file) {
-        if (!Objects.equals(file.getContentType(), MIME_IMAGE_PNG)) {
+        if (!Objects.equals(file.getContentType(), Const.MIME_IMAGE_PNG)) {
             return new ResponseEntity<>("Unsupported file type. This endpoint accepts only PNG images", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         }
 
-        if (file.getSize() > MAX_FILE_SIZE) {
-            return new ResponseEntity<>("Max file size is " + MAX_FILE_SIZE / 1024 + " KB. This file is " + file.getSize() / 1024 + " KB", HttpStatus.PAYLOAD_TOO_LARGE);
+        if (file.getSize() > Const.MAX_FILE_SIZE) {
+            return new ResponseEntity<>("Max file size is " + Const.MAX_FILE_SIZE / 1024 + " KB. This file is " + file.getSize() / 1024 + " KB", HttpStatus.PAYLOAD_TOO_LARGE);
         }
 
         byte[] image;
